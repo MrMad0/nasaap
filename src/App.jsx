@@ -14,8 +14,13 @@ function App() {
         prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
         tileSources: {
           type: "image",
-          url: "https://picsum.photos/2000/1500"
+          url: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=4000&q=80",
+          buildPyramid: true
         },
+        minZoomLevel: 0.5,
+        maxZoomLevel: 10,
+        zoomPerClick: 2,
+        zoomPerScroll: 1.2,
         showNavigationControl: true,
         showSequenceControl: false,
         showFullPageControl: false,
@@ -61,7 +66,14 @@ function App() {
           flickMinSpeed: 120,
           flickMomentum: 0.25,
           pinchRotate: false
-        }
+        },
+        // Additional settings for better zoom experience
+        animationTime: 1.2,
+        springStiffness: 5.0,
+        imageLoaderLimit: 5,
+        maxImageCacheCount: 200,
+        timeout: 120000,
+        useCanvas: true
       })
 
       // Add event handlers
@@ -71,7 +83,8 @@ function App() {
         // Try fallback image
         viewer.open({
           type: "image",
-          url: "https://picsum.photos/1500/1000"
+          url: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3000&q=80",
+          buildPyramid: true
         });
       });
 
