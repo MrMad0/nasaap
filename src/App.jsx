@@ -111,16 +111,24 @@ function App() {
         setLoading(false);
       });
 
-      // Add drawing event handlers
-      osdViewer.addHandler('canvas-click', function(event) {
+      // Add drawing event handlers using mouse events
+      const canvas = osdViewer.canvas;
+      
+      canvas.addEventListener('mousedown', function(event) {
         if (isDrawing) {
-          handleCanvasClick(event);
+          handleMouseDown(event, osdViewer);
         }
       });
 
-      osdViewer.addHandler('canvas-drag', function(event) {
-        if (isDrawing) {
-          handleCanvasDrag(event);
+      canvas.addEventListener('mousemove', function(event) {
+        if (isDrawing && startPoint) {
+          handleMouseMove(event, osdViewer);
+        }
+      });
+
+      canvas.addEventListener('mouseup', function(event) {
+        if (isDrawing && startPoint) {
+          handleMouseUp(event, osdViewer);
         }
       });
 
@@ -168,42 +176,99 @@ function App() {
     });
   }
 
-  // Handle canvas click for drawing
-  const handleCanvasClick = (event) => {
-    const point = event.position;
-    if (!startPoint) {
-      setStartPoint(point);
-    } else {
-      // Finish drawing
-      finishDrawing(point);
-    }
+  // Handle mouse down for drawing
+  const handleMouseDown = (event, viewer) => {
+    const rect = viewer.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Convert screen coordinates to image coordinates
+    const point = viewer.viewport.pointFromPixel(new OpenSeadragon.Point(x, y));
+    setStartPoint(point);
   }
 
-  // Handle canvas drag for drawing
-  const handleCanvasDrag = (event) => {
-    if (startPoint && isDrawing) {
-      // Update preview rectangle
-      const currentPoint = event.position;
-      // This would update a preview overlay
+  // Handle mouse move for drawing preview
+  const handleMouseMove = (event, viewer) => {
+    if (!startPoint) return;
+    
+    const rect = viewer.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Convert screen coordinates to image coordinates
+    const currentPoint = viewer.viewport.pointFromPixel(new OpenSeadragon.Point(x, y));
+    
+    // Update preview overlay
+    updatePreviewOverlay(startPoint, currentPoint, viewer);
+  }
+
+  // Handle mouse up to finish drawing
+  const handleMouseUp = (event, viewer) => {
+    if (!startPoint) return;
+    
+    const rect = viewer.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Convert screen coordinates to image coordinates
+    const endPoint = viewer.viewport.pointFromPixel(new OpenSeadragon.Point(x, y));
+    
+    // Finish drawing
+    finishDrawing(startPoint, endPoint);
+  }
+
+  // Update preview overlay during drawing
+  const updatePreviewOverlay = (start, current, viewer) => {
+    // Remove existing preview overlay
+    const existingPreview = document.getElementById('preview-overlay');
+    if (existingPreview) {
+      viewer.removeOverlay('preview-overlay');
+    }
+
+    // Create preview overlay
+    const width = Math.abs(current.x - start.x);
+    const height = Math.abs(current.y - start.y);
+    const x = Math.min(start.x, current.x);
+    const y = Math.min(start.y, current.y);
+
+    if (width > 0.01 && height > 0.01) { // Minimum size threshold
+      viewer.addOverlay({
+        id: 'preview-overlay',
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        className: 'preview-overlay',
+        placement: OpenSeadragon.Placement.TOP_LEFT
+      });
     }
   }
 
   // Finish drawing and show form
-  const finishDrawing = (endPoint) => {
-    if (!startPoint) return;
+  const finishDrawing = (start, end) => {
+    if (!start || !end) return;
+
+    // Remove preview overlay
+    if (viewer.current) {
+      viewer.current.removeOverlay('preview-overlay');
+    }
 
     const coordinates = [
-      Math.min(startPoint.x, endPoint.x),
-      Math.min(startPoint.y, endPoint.y),
-      Math.max(startPoint.x, endPoint.x),
-      Math.max(startPoint.y, endPoint.y)
+      Math.min(start.x, end.x),
+      Math.min(start.y, end.y),
+      Math.max(start.x, end.x),
+      Math.max(start.y, end.y)
     ];
 
-    setCurrentAnnotation({
-      coordinates,
-      shape_type: drawingMode,
-      label: ''
-    });
+    // Only create annotation if it has meaningful size
+    if (Math.abs(coordinates[2] - coordinates[0]) > 0.01 && 
+        Math.abs(coordinates[3] - coordinates[1]) > 0.01) {
+      setCurrentAnnotation({
+        coordinates,
+        shape_type: drawingMode,
+        label: ''
+      });
+    }
 
     setStartPoint(null);
     setIsDrawing(false);
