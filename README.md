@@ -1,12 +1,52 @@
-# React + Vite
+# NASA Space Apps Challenge - Image Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based image viewer built with OpenSeadragon for exploring high-resolution NASA imagery with annotations and AI analysis capabilities.
 
-Currently, two official plugins are available:
+## Day 1: Core Foundation ✅
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Features Implemented
+- **React + Vite** project setup for fast development
+- **OpenSeadragon** integration for smooth pan/zoom of tiled images
+- **Responsive layout** with sidebar and large viewer area
+- **Demo image** (highsmith.dzi) for testing viewer functionality
 
-## Expanding the ESLint configuration
+### Project Structure
+```
+src/
+├── App.jsx          # Main component with OpenSeadragon viewer
+├── App.css          # Layout and styling
+├── index.css        # Global styles
+└── main.jsx         # React entry point
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Getting Started
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Start development server:**
+   ```bash
+   npm run dev
+   ```
+
+3. **Test the viewer:**
+   - Open browser to `http://localhost:5173`
+   - Pan by dragging the image
+   - Zoom with mouse wheel or double-click
+   - Use navigation controls in the viewer
+
+### Next Steps (Future Days)
+- [ ] Integrate NASA imagery APIs
+- [ ] Add annotation tools
+- [ ] Implement AI analysis features
+- [ ] Add search and filtering
+- [ ] Enhanced UI/UX
+
+### Branch Strategy
+- `main` - Stable releases
+- `feature/nasa-api` - NASA imagery integration
+- `feature/annotations` - Annotation tools
+- `feature/ai-analysis` - AI features
+- `hotfix/*` - Bug fixes
