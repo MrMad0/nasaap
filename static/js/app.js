@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeViewer();
     setupEventListeners();
     loadAnnotations();
+    
+    // Set default drawing mode
+    setDrawingMode('rectangle');
 });
 
 // Initialize OpenSeadragon viewer
@@ -23,7 +26,7 @@ function initializeViewer() {
         prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
         tileSources: {
             type: "image",
-            url: "https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200412.3x5400x2700.jpg",
+            url: "https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/earth_lights_lrg.jpg",
             buildPyramid: true
         },
         minZoomLevel: 0.5,
@@ -90,7 +93,7 @@ function initializeViewer() {
         showError('Failed to load image. Trying fallback...');
         viewer.open({
             type: "image",
-            url: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3000&q=80",
+            url: "https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200412.3x5400x2700.jpg",
             buildPyramid: true
         });
     });
@@ -105,25 +108,30 @@ function initializeViewer() {
         hideLoading();
     });
 
-    // Add drawing event handlers
-    const canvas = viewer.canvas;
-    
-    canvas.addEventListener('mousedown', function(event) {
-        if (isDrawing) {
-            handleMouseDown(event);
-        }
-    });
+    // Add drawing event handlers - wait for canvas to be ready
+    viewer.addHandler('open', function() {
+        const canvas = viewer.canvas;
+        
+        canvas.addEventListener('mousedown', function(event) {
+            if (isDrawing) {
+                event.preventDefault();
+                handleMouseDown(event);
+            }
+        });
 
-    canvas.addEventListener('mousemove', function(event) {
-        if (isDrawing && startPoint) {
-            handleMouseMove(event);
-        }
-    });
+        canvas.addEventListener('mousemove', function(event) {
+            if (isDrawing && startPoint) {
+                event.preventDefault();
+                handleMouseMove(event);
+            }
+        });
 
-    canvas.addEventListener('mouseup', function(event) {
-        if (isDrawing && startPoint) {
-            handleMouseUp(event);
-        }
+        canvas.addEventListener('mouseup', function(event) {
+            if (isDrawing && startPoint) {
+                event.preventDefault();
+                handleMouseUp(event);
+            }
+        });
     });
 }
 
@@ -152,22 +160,32 @@ function setDrawingMode(mode) {
     
     // Update UI
     document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`[data-shape="${mode}"]`).classList.add('active');
+    const activeBtn = document.querySelector(`[data-shape="${mode}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
     
-    document.getElementById('drawing-instruction').style.display = 'block';
-    document.getElementById('drawing-instruction').textContent = `Click and drag to draw a ${mode}`;
+    const instruction = document.getElementById('drawing-instruction');
+    if (instruction) {
+        instruction.style.display = 'block';
+        instruction.textContent = `Click and drag to draw a ${mode}`;
+    }
     
     hideAnnotationForm();
+    
+    console.log(`Drawing mode set to: ${mode}`);
 }
 
 // Handle mouse down for drawing
 function handleMouseDown(event) {
+    console.log('Mouse down event triggered');
     const rect = viewer.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     
     const point = viewer.viewport.pointFromPixel(new OpenSeadragon.Point(x, y));
     startPoint = point;
+    console.log('Start point set:', startPoint);
 }
 
 // Handle mouse move for drawing preview
