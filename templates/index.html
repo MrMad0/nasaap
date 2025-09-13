@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Image Explorer</title>
+    <link rel="stylesheet" href="{% load static %}{% static 'css/style.css' %}">
+    <script src="https://openseadragon.github.io/openseadragon/openseadragon.min.js"></script>
+</head>
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <h2>NASA Image Explorer</h2>
+            
+            <!-- Drawing Tools -->
+            <div class="drawing-tools">
+                <h3>Drawing Tools</h3>
+                <div class="tool-buttons">
+                    <button id="rectangle-btn" class="tool-btn active" data-shape="rectangle">
+                        Rectangle
+                    </button>
+                    <button id="circle-btn" class="tool-btn" data-shape="circle">
+                        Circle
+                    </button>
+                </div>
+                <p id="drawing-instruction" class="drawing-instruction" style="display: none;">
+                    Click and drag to draw a rectangle
+                </p>
+            </div>
+
+            <!-- Annotation Form -->
+            <div id="annotation-form" class="annotation-form" style="display: none;">
+                <h3>Save Annotation</h3>
+                <input type="text" id="annotation-label" placeholder="Enter annotation label...">
+                <div class="form-buttons">
+                    <button id="save-annotation">Save</button>
+                    <button id="cancel-annotation">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Annotations List -->
+            <div class="annotations-list">
+                <h3>Saved Annotations (<span id="annotation-count">0</span>)</h3>
+                <div id="annotations-container">
+                    <p>No annotations yet. Draw something to get started!</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="viewer-container">
+            <div id="loading-overlay" class="loading-overlay">
+                <div class="loading-spinner"></div>
+                <p>Loading NASA image...</p>
+            </div>
+            <div id="error-overlay" class="error-overlay" style="display: none;">
+                <p id="error-message"></p>
+            </div>
+            <div id="openseadragon-viewer" class="openseadragon-viewer"></div>
+        </div>
+    </div>
+
+    <script src="{% load static %}{% static 'js/app.js' %}"></script>
+</body>
+</html>

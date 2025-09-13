@@ -1,0 +1,291 @@
+/* Main app layout */
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+/* Sidebar styling */
+.sidebar {
+  width: 350px;
+  background-color: #f5f5f5;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #007acc;
+  padding-bottom: 10px;
+}
+
+.sidebar h3 {
+  color: #555;
+  font-size: 1.1rem;
+  margin: 20px 0 10px 0;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* Drawing Tools */
+.drawing-tools {
+  margin-bottom: 20px;
+}
+
+.tool-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tool-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tool-btn:hover {
+  border-color: #007acc;
+  background-color: #f0f8ff;
+}
+
+.tool-btn.active {
+  border-color: #007acc;
+  background-color: #007acc;
+  color: white;
+}
+
+.drawing-instruction {
+  color: #666;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+/* Annotation Form */
+.annotation-form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.annotation-form input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.form-buttons button {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.form-buttons button:first-child {
+  background-color: #28a745;
+  color: white;
+}
+
+.form-buttons button:first-child:hover {
+  background-color: #218838;
+}
+
+.form-buttons button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
+
+.form-buttons button:last-child:hover {
+  background-color: #5a6268;
+}
+
+/* Annotations List */
+.annotations-list {
+  flex: 1;
+}
+
+#annotations-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.annotation-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.annotation-item:hover {
+  border-color: #007acc;
+  background-color: #f0f8ff;
+}
+
+.annotation-item.active {
+  border-color: #007acc;
+  background-color: #e3f2fd;
+}
+
+.annotation-info {
+  flex: 1;
+}
+
+.annotation-info strong {
+  display: block;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.annotation-type {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Viewer container */
+.viewer-container {
+  flex: 1;
+  position: relative;
+  background-color: #000;
+}
+
+/* OpenSeadragon viewer styling */
+.openseadragon-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+/* Override OpenSeadragon default styles for better integration */
+.openseadragon-viewer .openseadragon-canvas {
+  background-color: #000;
+}
+
+/* Annotation overlays */
+.annotation-overlay {
+  border: 2px solid #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.annotation-overlay:hover {
+  border-color: #ff5252;
+  background-color: rgba(255, 82, 82, 0.3);
+}
+
+/* Preview overlay for drawing */
+.preview-overlay {
+  border: 2px dashed #007acc;
+  background-color: rgba(0, 122, 204, 0.1);
+  pointer-events: none;
+}
+
+/* Loading and error overlays */
+.loading-overlay, .error-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333;
+  border-top: 4px solid #007acc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-overlay {
+  background-color: rgba(220, 53, 69, 0.9);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: 250px;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .viewer-container {
+    height: calc(100vh - 250px);
+  }
+  
+  .tool-buttons {
+    flex-direction: column;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+}
