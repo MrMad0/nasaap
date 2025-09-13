@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Image Explorer</title>
-    <link rel="stylesheet" href="{% load static %}{% static 'css/style.css' %}">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://openseadragon.github.io/openseadragon/openseadragon.min.js"></script>
 </head>
 <body>
@@ -59,6 +60,6 @@
         </div>
     </div>
 
-    <script src="{% load static %}{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

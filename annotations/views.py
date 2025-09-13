@@ -6,6 +6,11 @@ from .models import Annotation
 from .serializers import AnnotationSerializer
 
 
+def index(request):
+    """Main page view for the NASA Image Explorer"""
+    return render(request, 'index.html')
+
+
 class AnnotationListCreateView(generics.ListCreateAPIView):
     """List all annotations or create a new annotation"""
     queryset = Annotation.objects.all()
@@ -45,8 +50,3 @@ def annotation_detail(request, pk):
         return Response(serializer.data)
     except Annotation.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-def index(request):
-    """Main page view"""
-    return render(request, 'index.html')
