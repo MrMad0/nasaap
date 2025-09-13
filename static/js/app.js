@@ -26,7 +26,7 @@ function initializeViewer() {
         prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
         tileSources: {
             type: "image",
-            url: "https://eoimages.gsfc.nasa.gov/images/imagerecords/144000/144898/earth_lights_lrg.jpg",
+            url: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=4000&q=80",
             buildPyramid: true
         },
         minZoomLevel: 0.5,
@@ -93,7 +93,7 @@ function initializeViewer() {
         showError('Failed to load image. Trying fallback...');
         viewer.open({
             type: "image",
-            url: "https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73751/world.topo.bathy.200412.3x5400x2700.jpg",
+            url: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3000&q=80",
             buildPyramid: true
         });
     });
