@@ -1,179 +1,232 @@
-// Global variables
+// NASA Image Viewer - Clean version without drawing tools
 let viewer = null;
-let isDrawing = false;
-let drawingMode = 'rectangle';
-let startPoint = null;
-let currentAnnotation = null;
-let annotations = [];
-
-// API base URL
-const API_BASE = '/api/';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing NASA Image Viewer...');
     initializeViewer();
-    setupEventListeners();
-    loadAnnotations();
-    
-    // Set default drawing mode
-    setDrawingMode('rectangle');
 });
 
 // Initialize OpenSeadragon viewer
 function initializeViewer() {
-    viewer = OpenSeadragon({
-        id: "openseadragon-viewer",
-        prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-        tileSources: {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=4000&q=80",
-            buildPyramid: true
-        },
-        minZoomLevel: 0.5,
-        maxZoomLevel: 10,
-        zoomPerClick: 2,
-        zoomPerScroll: 1.2,
-        showNavigationControl: true,
-        showSequenceControl: false,
-        showFullPageControl: false,
-        showHomeControl: true,
-        showZoomControl: true,
-        showRotationControl: false,
-        showFlipControl: false,
-        showNavigator: false,
-        sequenceMode: false,
-        referenceStripSize: 100,
-        referenceStripPosition: "BOTTOM_LEFT",
-        referenceStripScroll: "HORIZONTAL",
-        showReferenceStrip: false,
-        collectionMode: false,
-        collectionRows: 1,
-        collectionColumns: 0,
-        collectionLayout: "horizontal",
-        collectionTileSize: 800,
-        collectionTileMargin: 80,
-        gestureSettingsMouse: {
-            clickToZoom: true,
-            dblClickToZoom: true,
-            pinchToZoom: true,
-            flickEnabled: true,
-            flickMinSpeed: 120,
-            flickMomentum: 0.25,
-            pinchRotate: false
-        },
-        gestureSettingsTouch: {
-            clickToZoom: true,
-            dblClickToZoom: true,
-            pinchToZoom: true,
-            flickEnabled: true,
-            flickMinSpeed: 120,
-            flickMomentum: 0.25,
-            pinchRotate: false
-        },
-        gestureSettingsPen: {
-            clickToZoom: true,
-            dblClickToZoom: true,
-            pinchToZoom: true,
-            flickEnabled: true,
-            flickMinSpeed: 120,
-            flickMomentum: 0.25,
-            pinchRotate: false
-        },
-        animationTime: 1.2,
-        springStiffness: 5.0,
-        imageLoaderLimit: 5,
-        maxImageCacheCount: 200,
-        timeout: 120000,
-        useCanvas: true
-    });
-
-    // Add event handlers
-    viewer.addHandler('open-failed', function(event) {
-        console.error('Failed to open image:', event);
-        showError('Failed to load image. Trying fallback...');
-        viewer.open({
-            type: "image",
-            url: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3000&q=80",
-            buildPyramid: true
+    showLoading();
+    console.log('Starting viewer initialization...');
+    
+    // Check if there's a selected image from gallery
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('image_id');
+    console.log('Image ID from URL:', imageId);
+    
+    let imageTileSource = {
+        type: "image",
+        url: "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&auto=format&fit=crop&w=4000&q=80",
+        buildPyramid: true
+    };
+    
+    // If image ID is provided, load the selected image
+    if (imageId) {
+        console.log('Loading selected image with ID:', imageId);
+        loadSelectedImage(imageId).then(imageUrl => {
+            if (imageUrl) {
+                console.log('Loaded image URL:', imageUrl);
+                imageTileSource.url = imageUrl;
+            } else {
+                console.log('Failed to load image, using fallback');
+            }
+            createViewer(imageTileSource);
+        }).catch(error => {
+            console.error('Error loading selected image:', error);
+            createViewer(imageTileSource);
         });
-    });
+    } else {
+        console.log('No image ID provided, using default image');
+        createViewer(imageTileSource);
+    }
+}
 
-    viewer.addHandler('open', function(event) {
-        console.log('Image loaded successfully');
-        hideLoading();
-        hideError();
-    });
+// Load selected image from gallery API
+async function loadSelectedImage(imageId) {
+    try {
+        console.log('Fetching image data from API...');
+        const response = await fetch(`/api/gallery/${imageId}/`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const imageData = await response.json();
+        console.log('Image data received:', imageData);
+        return imageData.image_url;
+    } catch (error) {
+        console.error('Failed to load selected image:', error);
+        return null;
+    }
+}
 
-    viewer.addHandler('tile-loaded', function(event) {
-        hideLoading();
-    });
 
-    // Add drawing event handlers - wait for canvas to be ready
-    viewer.addHandler('open', function() {
-        const canvas = viewer.canvas;
+
+// Create the OpenSeadragon viewer
+function createViewer(tileSources) {
+    console.log('Creating OpenSeadragon viewer with source:', tileSources);
+    
+    try {    
+
+        viewer = OpenSeadragon({            
+            id: "openseadragon-viewer",
+
+            prefixUrl: "https://openseadragon.github.io/openseadragon/images/",            prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
+
+            tileSources: tileSources,            
+
+            minZoomLevel: 0.5,            
+
+            maxZoomLevel: 10,           
+
+            zoomPerClick: 2,            
+
+            zoomPerScroll: 1.2,            
+
+            showNavigationControl: true,            
+
+            showHomeControl: true,            
+
+            showZoomControl: true,            
+
+            animationTime: 1.2,            
+
+            springStiffness: 5.0,            
+
+            timeout: 30000,            
+
+            useCanvas: true,            
+
+            preserveViewport: false,            
+
+            visibilityRatio: 0.5,            
+
+            constrainDuringPan: false,            
+
+            wrapHorizontal: false,            
+
+            wrapVertical: false,            
+
+            immediateRender: false,            
+
+            blendTime: 0.5,            
+
+            alwaysBlend: false,            
+
+            autoHideControls: true,            
+
+            showFullPageControl: false,            
+
+            showRotationControl: false,            
+
+        });       
+
+
+
+        // Add event handlers        // Add event handlers
+
+        viewer.addHandler('open-failed', function(event) {
+
+            console.error('Failed to open image:', event);            
+
+            showError('Failed to load image. Trying fallback...');          
+
+                        
+
+            // Try fallback image            // Try fallback image
+
+            viewer.open({            
+
+                type: "image",               
+
+                url: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=3000&q=80",                
+
+                buildPyramid: true               
+
+            });            
+        });
+
+
+
+        viewer.addHandler('open', function(event) {        
+
+            console.log('Image loaded successfully');            
+
+            hideLoading();            
+
+            hideError();            
+
+        });       
+
+
+
+        viewer.addHandler('tile-loaded', function(event) {        
+
+            hideLoading();            
+
+        });    
+
+                
+
+        viewer.addHandler('tile-load-failed', function(event) {        
+
+            console.error('Tile load failed:', event);            
+
+        });      
+
+                
+
+        console.log('OpenSeadragon viewer created successfully');        
+
         
-        canvas.addEventListener('mousedown', function(event) {
-            if (isDrawing) {
-                event.preventDefault();
-                handleMouseDown(event);
-            }
-        });
-
-        canvas.addEventListener('mousemove', function(event) {
-            if (isDrawing && startPoint) {
-                event.preventDefault();
-                handleMouseMove(event);
-            }
-        });
-
-        canvas.addEventListener('mouseup', function(event) {
-            if (isDrawing && startPoint) {
-                event.preventDefault();
-                handleMouseUp(event);
-            }
-        });
-    });
+    } catch (error) {
+        console.error('Error creating viewer:', error);
+        showError('Error initializing viewer: ' + error.message);
+    }
 }
 
-// Setup event listeners for UI elements
-function setupEventListeners() {
-    // Drawing tool buttons
-    document.getElementById('rectangle-btn').addEventListener('click', function() {
-        setDrawingMode('rectangle');
-    });
-
-    document.getElementById('circle-btn').addEventListener('click', function() {
-        setDrawingMode('circle');
-    });
-
-    // Annotation form buttons
-    document.getElementById('save-annotation').addEventListener('click', saveAnnotation);
-    document.getElementById('cancel-annotation').addEventListener('click', cancelAnnotation);
+// Show loading overlay
+function showLoading() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+    }
 }
 
-// Set drawing mode
-function setDrawingMode(mode) {
-    drawingMode = mode;
-    isDrawing = true;
-    startPoint = null;
-    currentAnnotation = null;
-    
-    // Update UI
-    document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.querySelector(`[data-shape="${mode}"]`);
-    if (activeBtn) {
-        activeBtn.classList.add('active');
+// Hide loading overlay
+function hideLoading() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
     }
-    
-    const instruction = document.getElementById('drawing-instruction');
-    if (instruction) {
-        instruction.style.display = 'block';
-        instruction.textContent = `Click and drag to draw a ${mode}`;
+}
+
+
+
+// Show error message
+function showError(message) {
+    const errorOverlay = document.getElementById('error-overlay');
+    const errorMessage = document.getElementById('error-message');
+    if (errorOverlay && errorMessage) {
+        errorMessage.textContent = message;
+        errorOverlay.style.display = 'flex';
     }
-    
-    hideAnnotationForm();
-    
-    console.log(`Drawing mode set to: ${mode}`);
+    console.error(message);
+}
+
+// Hide error overlay
+function hideError() {
+    const errorOverlay = document.getElementById('error-overlay');
+    if (errorOverlay) {
+        errorOverlay.style.display = 'none';
+    }
+}
+
+// Retry loading image
+function retryLoad() {
+    hideError();
+    initializeViewer();
 }
 
 // Handle mouse down for drawing

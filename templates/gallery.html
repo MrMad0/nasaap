@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Image Gallery</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+</head>
+<body class="bg-dark text-light">
+    <div class="container-fluid p-0">
+        <!-- Header -->
+        <header class="bg-gradient text-white py-4 shadow-lg">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 fw-bold mb-2">
+                            <i class="bi bi-stars me-3"></i>NASA Image Gallery
+                        </h1>
+                        <p class="lead mb-0">Explore high-resolution NASA imagery with our advanced viewer</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                            <i class="bi bi-images me-1"></i>Space Exploration
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search and Filter -->
+        <div class="container my-4">
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-primary text-white border-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="search-input" class="form-control border-0 shadow-sm" 
+                               placeholder="Search images by title or description...">
+                        <button id="search-btn" class="btn btn-primary px-4" type="button">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="category-filter" class="form-select form-select-lg shadow-sm">
+                        <option value="">All Categories</option>
+                        <option value="Earth">🌍 Earth</option>
+                        <option value="Space">🌌 Space</option>
+                        <option value="Mars">🔴 Mars</option>
+                        <option value="Moon">🌙 Moon</option>
+                        <option value="Satellites">🛰️ Satellites</option>
+                        <option value="Other">📡 Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="source-filter" class="form-select form-select-lg shadow-sm">
+                        <option value="">All Sources</option>
+                        <option value="NASA">🚀 NASA</option>
+                        <option value="ESA">🇪🇺 ESA</option>
+                        <option value="Other">🌐 Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading and Error States -->
+        <div class="container">
+            <div id="loading-spinner" class="text-center py-5" style="display: none;">
+                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h4 class="text-muted">Loading images...</h4>
+            </div>
+
+            <div id="error-message" class="alert alert-danger alert-dismissible fade show" style="display: none;" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span id="error-text"></span>
+                <button type="button" class="btn-close" aria-label="Close" onclick="this.parentElement.style.display='none'"></button>
+            </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="container">
+            <div class="row g-4" id="gallery-grid">
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted">Loading gallery...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="container">
+            <nav aria-label="Gallery pagination" id="pagination" style="display: none;">
+                <ul class="pagination pagination-lg justify-content-center">
+                    <li class="page-item">
+                        <button id="prev-page" class="page-link" aria-label="Previous">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
+                    </li>
+                    <li class="page-item active">
+                        <span class="page-link" id="page-info">Page 1 of 1</span>
+                    </li>
+                    <li class="page-item">
+                        <button id="next-page" class="page-link" aria-label="Next">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-light py-4 mt-5">
+            <div class="container text-center">
+                <p class="mb-2">&copy; 2025 NASA Image Explorer. Built for Space Apps Challenge.</p>
+                <p class="text-muted small">Powered by OpenSeadragon & Django REST Framework</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/gallery.js' %}"></script>
+</body>
+</html>

@@ -5,61 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASA Image Explorer</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- OpenSeadragon -->
     <script src="https://openseadragon.github.io/openseadragon/openseadragon.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <div class="app">
-        <div class="sidebar">
-            <h2>NASA Image Explorer</h2>
+<body class="bg-light">
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Sidebar -->
+            <div class="col-lg-3 col-md-4 bg-dark text-light p-0 d-flex flex-column">
+                <div class="p-3 border-bottom border-secondary">
+                    <h2 class="h4 mb-0 text-primary">
+                        <i class="bi bi-telescope me-2"></i>NASA Image Explorer
+                    </h2>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="p-3 border-bottom border-secondary">
+                    <a href="/" class="btn btn-outline-light w-100 mb-3">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Gallery
+                    </a>
+                    {% if selected_image %}
+                    <div class="alert alert-info mb-0">
+                        <h6 class="alert-heading mb-2">
+                            <i class="bi bi-image me-2"></i>Current Image
+                        </h6>
+                        <p class="mb-1"><strong>{{ selected_image.title }}</strong></p>
+                        <small class="text-muted">{{ selected_image.source }} - {{ selected_image.category }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Image Information -->
+                <div class="p-3 flex-grow-1 overflow-auto">
+                    {% if selected_image %}
+                    <h5 class="text-primary mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Image Details
+                    </h5>
+                    <div class="mb-3">
+                        <h6 class="text-light mb-2">Description:</h6>
+                        <p class="text-muted small">{{ selected_image.description }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-light mb-2">Source:</h6>
+                        <p class="text-muted small">{{ selected_image.source }}</p>
+                    </div>
+                    {% if selected_image.category %}
+                    <div class="mb-3">
+                        <h6 class="text-light mb-2">Category:</h6>
+                        <span class="badge bg-primary">{{ selected_image.category }}</span>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center p-4">
+                        <i class="bi bi-image-alt display-4 text-muted mb-3"></i>
+                        <h5 class="text-light">No Image Selected</h5>
+                        <p class="text-muted">Go back to the gallery to select an image to view.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
             
-            <!-- Drawing Tools -->
-            <div class="drawing-tools">
-                <h3>Drawing Tools</h3>
-                <div class="tool-buttons">
-                    <button id="rectangle-btn" class="tool-btn active" data-shape="rectangle">
-                        Rectangle
-                    </button>
-                    <button id="circle-btn" class="tool-btn" data-shape="circle">
-                        Circle
-                    </button>
+            <!-- Main Viewer Area -->
+            <div class="col-lg-9 col-md-8 p-0 position-relative">
+                <!-- Loading Overlay -->
+                <div id="loading-overlay" class="position-absolute top-0 start-0 w-100 h-100 bg-dark d-flex flex-column justify-content-center align-items-center text-light" style="z-index: 1000;">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="h5">Loading NASA image...</p>
                 </div>
-                <p id="drawing-instruction" class="drawing-instruction" style="display: none;">
-                    Click and drag to draw a rectangle
-                </p>
-            </div>
-
-            <!-- Annotation Form -->
-            <div id="annotation-form" class="annotation-form" style="display: none;">
-                <h3>Save Annotation</h3>
-                <input type="text" id="annotation-label" placeholder="Enter annotation label...">
-                <div class="form-buttons">
-                    <button id="save-annotation">Save</button>
-                    <button id="cancel-annotation">Cancel</button>
+                
+                <!-- Error Overlay -->
+                <div id="error-overlay" class="position-absolute top-0 start-0 w-100 h-100 bg-danger d-flex justify-content-center align-items-center text-light" style="display: none; z-index: 999;">
+                    <div class="text-center">
+                        <i class="bi bi-exclamation-triangle display-4 mb-3"></i>
+                        <p id="error-message" class="h5"></p>
+                    </div>
                 </div>
+                
+                <!-- OpenSeadragon Viewer -->
+                <div id="openseadragon-viewer" class="w-100 h-100"></div>
             </div>
-
-            <!-- Annotations List -->
-            <div class="annotations-list">
-                <h3>Saved Annotations (<span id="annotation-count">0</span>)</h3>
-                <div id="annotations-container">
-                    <p>No annotations yet. Draw something to get started!</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="viewer-container">
-            <div id="loading-overlay" class="loading-overlay">
-                <div class="loading-spinner"></div>
-                <p>Loading NASA image...</p>
-            </div>
-            <div id="error-overlay" class="error-overlay" style="display: none;">
-                <p id="error-message"></p>
-            </div>
-            <div id="openseadragon-viewer" class="openseadragon-viewer"></div>
         </div>
     </div>
 
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
     <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

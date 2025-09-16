@@ -2,10 +2,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Main page
-    path('', views.index, name='index'),
+    # Main pages
+    path('', views.gallery, name='gallery'),
+    path('viewer/', views.index, name='viewer'),
     
-    # API endpoints
+    # Gallery API endpoints
+    path('api/gallery/', views.GalleryImageListCreateView.as_view(), name='gallery-list-create'),
+    path('api/gallery/<int:pk>/', views.GalleryImageDetailView.as_view(), name='gallery-detail'),
+    
+    # Annotation API endpoints
     path('api/', views.AnnotationListCreateView.as_view(), name='annotation-list-create'),
     path('api/<int:pk>/', views.AnnotationDetailView.as_view(), name='annotation-detail'),
     

@@ -1,5 +1,18 @@
 from rest_framework import serializers
-from .models import Annotation
+from .models import Annotation, GalleryImage
+
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GalleryImage
+        fields = ['id', 'title', 'description', 'image_url', 'thumbnail_url', 'source', 'category', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def validate_image_url(self, value):
+        """Validate that image_url is a valid URL"""
+        if not value:
+            raise serializers.ValidationError("Image URL is required")
+        return value
 
 
 class AnnotationSerializer(serializers.ModelSerializer):

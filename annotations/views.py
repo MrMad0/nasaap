@@ -2,13 +2,39 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import Annotation
-from .serializers import AnnotationSerializer
+from .models import Annotation, GalleryImage
+from .serializers import AnnotationSerializer, GalleryImageSerializer
 
 
 def index(request):
     """Main page view for the NASA Image Explorer"""
-    return render(request, 'index.html')
+    image_id = request.GET.get('image_id')
+    selected_image = None
+    
+    if image_id:
+        try:
+            selected_image = GalleryImage.objects.get(id=image_id)
+        except GalleryImage.DoesNotExist:
+            pass
+    
+    return render(request, 'index.html', {'selected_image': selected_image})
+
+
+def gallery(request):
+    """Gallery page view"""
+    return render(request, 'gallery.html')
+
+
+class GalleryImageListCreateView(generics.ListCreateAPIView):
+    """List all gallery images or create a new gallery image"""
+    queryset = GalleryImage.objects.all()
+    serializer_class = GalleryImageSerializer
+
+
+class GalleryImageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, update or delete a gallery image"""
+    queryset = GalleryImage.objects.all()
+    serializer_class = GalleryImageSerializer
 
 
 class AnnotationListCreateView(generics.ListCreateAPIView):
